@@ -45,11 +45,11 @@ def convert_csv_to_markdown(csv_file, filename: str) -> str:
                 # Add horizontal rule to separate entries
                 markdown_lines.append("\n---\n")
             
-            # Write each key-value pair
+            # Write each key-value pair with markdown line breaks (two spaces at end)
             for header in headers:
                 key = header.strip()
                 value = row[header].strip()
-                markdown_lines.append(f"{key}: {value}")
+                markdown_lines.append(f"{key}: {value}  ")  # Two spaces for markdown line break
         
         return "\n".join(markdown_lines)
     
