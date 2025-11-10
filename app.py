@@ -6,6 +6,7 @@ Allows users to upload a CSV file and view/download the markdown output.
 """
 
 import streamlit as st
+import streamlit.components.v1 as components
 import csv
 import io
 from pathlib import Path
@@ -105,9 +106,9 @@ def main():
                 st.subheader("📋 Markdown Preview")
             
             with col2:
-                # Copy button - shows markdown in a copyable format
-                if st.button("📋 Copy", use_container_width=True):
-                    st.session_state['show_copy'] = True
+                # Copy button - automatically copies to clipboard
+                if st.button("📋 Copy", use_container_width=True, key="copy_btn"):
+                    st.session_state['just_copied'] = True
             
             with col3:
                 # Download button
@@ -119,18 +120,27 @@ def main():
                     use_container_width=True
                 )
             
-            # Show copyable text area if copy button was clicked
-            if st.session_state.get('show_copy', False):
-                st.text_area(
-                    "Copy the markdown below:",
-                    value=st.session_state['markdown_content'],
-                    height=200,
-                    key="copy_area",
-                    help="Select all (Cmd/Ctrl + A) and copy (Cmd/Ctrl + C)"
-                )
-                if st.button("✓ Done", key="done_copying"):
-                    st.session_state['show_copy'] = False
-                    st.rerun()
+            # Auto-copy to clipboard using JavaScript
+            if st.session_state.get('just_copied', False):
+                # Escape the markdown content for JavaScript
+                escaped_content = st.session_state['markdown_content'].replace('\\', '\\\\').replace('`', '\\`').replace('$', '\\$')
+                
+                copy_js = f"""
+                    <script>
+                    function copyToClipboard() {{
+                        const text = `{escaped_content}`;
+                        navigator.clipboard.writeText(text).then(function() {{
+                            console.log('Copied to clipboard successfully!');
+                        }}, function(err) {{
+                            console.error('Could not copy text: ', err);
+                        }});
+                    }}
+                    copyToClipboard();
+                    </script>
+                """
+                components.html(copy_js, height=0)
+                st.success("✅ Markdown copied to clipboard!")
+                st.session_state['just_copied'] = False
             
             # Show the rendered markdown
             with st.container(border=True):
