@@ -70,7 +70,7 @@ def main():
     # Header
     st.title("📄 CSV to Markdown Converter")
     st.markdown("""
-    Convert your CSV files into structured Markdown format.
+    Upload your CSV file and instantly convert it to structured Markdown format.
     Each row becomes a block of key-value pairs.
     """)
     
@@ -85,17 +85,20 @@ def main():
         # Show file details
         st.success(f"✅ File uploaded: **{uploaded_file.name}**")
         
-        # Convert button
-        if st.button("🔄 Convert to Markdown", type="primary"):
+        # Auto-convert when file is uploaded or changed
+        current_filename = Path(uploaded_file.name).stem
+        
+        # Check if this is a new file or if we need to reconvert
+        if 'filename' not in st.session_state or st.session_state['filename'] != current_filename:
             with st.spinner("Converting..."):
                 # Convert CSV to Markdown
                 markdown_content = convert_csv_to_markdown(uploaded_file, uploaded_file.name)
                 
                 # Store in session state
                 st.session_state['markdown_content'] = markdown_content
-                st.session_state['filename'] = Path(uploaded_file.name).stem
+                st.session_state['filename'] = current_filename
         
-        # Display results if available
+        # Display results
         if 'markdown_content' in st.session_state:
             st.markdown("---")
             
