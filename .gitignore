@@ -25,10 +25,13 @@ Thumbs.db
 # Streamlit
 .streamlit/secrets.toml
 
-# Output files
+# Output files (generated markdown, but keep documentation)
 *.md
 !README.md
+!QUICKSTART.md
+!DEPLOYMENT.md
 
 # CSV files (except examples)
 *.csv
+!example.csv
 
