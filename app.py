@@ -9,6 +9,7 @@ import streamlit as st
 import streamlit.components.v1 as components
 import csv
 import io
+import json
 from pathlib import Path
 
 def convert_csv_to_markdown(csv_file, filename: str) -> str:
@@ -125,13 +126,13 @@ def main():
             
             # Auto-copy to clipboard using JavaScript
             if st.session_state.get('just_copied', False):
-                # Escape the markdown content for JavaScript
-                escaped_content = st.session_state['markdown_content'].replace('\\', '\\\\').replace('`', '\\`').replace('$', '\\$')
+                # Properly encode the content as JSON to handle all special characters
+                content_json = json.dumps(st.session_state['markdown_content'])
                 
                 copy_js = f"""
                     <script>
                     function copyToClipboard() {{
-                        const text = `{escaped_content}`;
+                        const text = {content_json};
                         navigator.clipboard.writeText(text).then(function() {{
                             console.log('Copied to clipboard successfully!');
                         }}, function(err) {{
