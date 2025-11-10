@@ -117,14 +117,23 @@ def main():
                     use_container_width=True
                 )
             
-            # Copyable code block with built-in copy button
+            # Copyable code block with built-in copy button and fixed height
             st.markdown("**📋 Click the copy icon to copy markdown:**")
-            st.code(st.session_state['markdown_content'], language=None, line_numbers=False)
             
-            # Show the rendered markdown preview
-            st.markdown("**👁️ Rendered Preview:**")
-            with st.container(border=True):
-                st.markdown(st.session_state['markdown_content'])
+            # Add custom CSS for fixed height scrollable code block
+            st.markdown("""
+                <style>
+                div[data-testid="stCodeBlock"] {
+                    height: 400px;
+                    overflow-y: auto;
+                }
+                div[data-testid="stCodeBlock"] > div {
+                    height: 100%;
+                }
+                </style>
+            """, unsafe_allow_html=True)
+            
+            st.code(st.session_state['markdown_content'], language=None, line_numbers=False)
     
     else:
         # Instructions when no file is uploaded
