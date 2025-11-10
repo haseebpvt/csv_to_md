@@ -98,20 +98,39 @@ def main():
         if 'markdown_content' in st.session_state:
             st.markdown("---")
             
-            # Create two columns for preview and download
-            col1, col2 = st.columns([3, 1])
+            # Create columns for preview title and action buttons
+            col1, col2, col3 = st.columns([2, 1, 1])
             
             with col1:
                 st.subheader("📋 Markdown Preview")
             
             with col2:
+                # Copy button - shows markdown in a copyable format
+                if st.button("📋 Copy", use_container_width=True):
+                    st.session_state['show_copy'] = True
+            
+            with col3:
                 # Download button
                 st.download_button(
                     label="⬇️ Download",
                     data=st.session_state['markdown_content'],
                     file_name=f"{st.session_state['filename']}.md",
-                    mime="text/markdown"
+                    mime="text/markdown",
+                    use_container_width=True
                 )
+            
+            # Show copyable text area if copy button was clicked
+            if st.session_state.get('show_copy', False):
+                st.text_area(
+                    "Copy the markdown below:",
+                    value=st.session_state['markdown_content'],
+                    height=200,
+                    key="copy_area",
+                    help="Select all (Cmd/Ctrl + A) and copy (Cmd/Ctrl + C)"
+                )
+                if st.button("✓ Done", key="done_copying"):
+                    st.session_state['show_copy'] = False
+                    st.rerun()
             
             # Show the rendered markdown
             with st.container(border=True):
