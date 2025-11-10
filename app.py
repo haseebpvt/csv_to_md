@@ -6,10 +6,8 @@ Allows users to upload a CSV file and view/download the markdown output.
 """
 
 import streamlit as st
-import streamlit.components.v1 as components
 import csv
 import io
-import json
 from pathlib import Path
 
 def convert_csv_to_markdown(csv_file, filename: str) -> str:
@@ -104,17 +102,12 @@ def main():
             st.markdown("---")
             
             # Create columns for preview title and action buttons
-            col1, col2, col3 = st.columns([2, 1, 1])
+            col1, col2 = st.columns([2, 1])
             
             with col1:
                 st.subheader("📋 Markdown Preview")
             
             with col2:
-                # Copy button - automatically copies to clipboard
-                if st.button("📋 Copy", use_container_width=True, key="copy_btn"):
-                    st.session_state['just_copied'] = True
-            
-            with col3:
                 # Download button
                 st.download_button(
                     label="⬇️ Download",
@@ -124,35 +117,14 @@ def main():
                     use_container_width=True
                 )
             
-            # Auto-copy to clipboard using JavaScript
-            if st.session_state.get('just_copied', False):
-                # Properly encode the content as JSON to handle all special characters
-                content_json = json.dumps(st.session_state['markdown_content'])
-                
-                copy_js = f"""
-                    <script>
-                    function copyToClipboard() {{
-                        const text = {content_json};
-                        navigator.clipboard.writeText(text).then(function() {{
-                            console.log('Copied to clipboard successfully!');
-                        }}, function(err) {{
-                            console.error('Could not copy text: ', err);
-                        }});
-                    }}
-                    copyToClipboard();
-                    </script>
-                """
-                components.html(copy_js, height=0)
-                st.success("✅ Markdown copied to clipboard!")
-                st.session_state['just_copied'] = False
+            # Copyable code block with built-in copy button
+            st.markdown("**📋 Click the copy icon to copy markdown:**")
+            st.code(st.session_state['markdown_content'], language=None, line_numbers=False)
             
-            # Show the rendered markdown
+            # Show the rendered markdown preview
+            st.markdown("**👁️ Rendered Preview:**")
             with st.container(border=True):
                 st.markdown(st.session_state['markdown_content'])
-            
-            # Show raw markdown in expander
-            with st.expander("📝 View Raw Markdown"):
-                st.code(st.session_state['markdown_content'], language="markdown")
     
     else:
         # Instructions when no file is uploaded
